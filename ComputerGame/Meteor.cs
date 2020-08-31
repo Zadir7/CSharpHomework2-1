@@ -9,13 +9,13 @@ namespace ComputerGame
 {
     class Meteor : BaseObject
     {
+        Image img;
         public Meteor(Point pos, Point dir, Size size) : base(pos,dir,size)
         {
-
+            img = Image.FromFile("meteor.jpg");
         }
         public override void Draw()
         {
-            Image img = Image.FromFile("meteor.jpg");
             GameBondarev.Buffer.Graphics.DrawImage(img, Pos.X, Pos.Y, Size.Width, Size.Height);
             //GameBondarev.Buffer.Graphics.FillEllipse(Brushes.PaleGoldenrod, Pos.X, Pos.Y, Size.Width, Size.Height);
         }

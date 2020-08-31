@@ -7,29 +7,44 @@ using System.Threading.Tasks;
 
 namespace ComputerGame
 {
-    class BaseObject
+    abstract class BaseObject : ICollision
     {
-        protected Point Pos;
-        protected Point Dir;
-        protected Size Size;
+        internal Point Pos;
+        internal Point Dir;
+        internal Size Size;
         public BaseObject(Point pos, Point dir, Size size)
         {
-            Pos = pos;
-            Dir = dir;
-            Size = size;
+            if (Pos.X < 0 ||
+                Pos.Y < 0)
+            {
+                throw new GameException("Объект находится в другой галактике");
+            } else
+            {
+                Pos = pos;
+            }
+            
+
+            if (dir.X > 50 || dir.Y > 50)
+            {
+                throw new GameException("Объект перешел на гиперскорость, обсчет невозможен!");
+            } else
+            {
+                Dir = dir;
+            }
+            if (size.Width < 0 || size.Height < 0)
+            {
+                throw new GameException("Размеры обьекта несуществующе малы!");
+            } else
+            {
+                Size = size;
+            }
         }
-        public virtual void Draw()
-        {
-            GameBondarev.Buffer.Graphics.DrawEllipse(Pens.White, Pos.X, Pos.Y,Size.Width, Size.Height);
-        }
-        public virtual void Update()
-        {
-            Pos.X = Pos.X + Dir.X;
-            Pos.Y = Pos.Y + Dir.Y;
-            if (Pos.X < 0) { Dir.X = -Dir.X; }
-            if (Pos.X > GameBondarev.Width) { Dir.X = -Dir.X; }
-            if (Pos.Y < 0) { Dir.Y = -Dir.Y; }
-            if (Pos.Y > GameBondarev.Height) { Dir.Y = -Dir.Y; }
-        }
+
+        public Rectangle HitBox => new Rectangle(Pos, Size);
+
+        public bool Collision(ICollision obj) => obj.HitBox.IntersectsWith(this.HitBox);
+
+        public abstract void Draw();
+        public abstract void Update();
     }
 }

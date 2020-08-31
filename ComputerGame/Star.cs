@@ -9,13 +9,13 @@ namespace ComputerGame
 {
     class Star : BaseObject
     {
+        Image img;
         public Star(Point pos, Point dir, Size size) : base(pos, dir, size)
         {
-
+            img = Image.FromFile("star.jpg");
         }
         public override void Draw()
         {
-            Image img = Image.FromFile("star.jpg");
             GameBondarev.Buffer.Graphics.DrawImage(img, Pos.X, Pos.Y, Size.Width, Size.Height);
             //GameBondarev.Buffer.Graphics.DrawLine(Pens.White, Pos.X, Pos.Y, Pos.X + Size.Width, Pos.Y + Size.Height);
             //GameBondarev.Buffer.Graphics.DrawLine(Pens.White, Pos.X + Size.Width, Pos.Y, Pos.X, Pos.Y + Size.Height);

@@ -13,6 +13,7 @@ namespace ComputerGame
         private static BufferedGraphicsContext _context;
         public static BufferedGraphics Buffer;
         public static BaseObject[] _objs;
+        public static Bullet _bullet;
         static Random r = new Random();
 
         public static int Width { get; set; }
@@ -26,8 +27,17 @@ namespace ComputerGame
             Graphics g;
             _context = BufferedGraphicsManager.Current;
             g = form.CreateGraphics();
-            Width = form.ClientSize.Width;
-            Height = form.ClientSize.Height;
+            if (form.Width < 0 || 
+                form.Width > 1000 || 
+                form.Height < 0 || 
+                form.Height > 1000)
+            {
+                throw new ArgumentOutOfRangeException();
+            } else
+            {
+                Width = form.ClientSize.Width;
+                Height = form.ClientSize.Height;
+            }
             Buffer = _context.Allocate(g, new Rectangle(0, 0, Width, Height));
             Load();
             Timer timer = new Timer { Interval = 100 };
@@ -48,6 +58,7 @@ namespace ComputerGame
             {
                 obj.Draw();
             }
+            _bullet.Draw();
             Buffer.Render();
         }
         public static void Load()
@@ -65,13 +76,21 @@ namespace ComputerGame
             {
                 _objs[i] = new Star(new Point(700, (i- _objs.Length / 2) * 30), new Point(r.Next(i/3,i), 0), new Size(7,7));
             }
+            _bullet = new Bullet(new Point(10,300), new Point(30,0), new Size(30,15));
+            
         }
         public static void Update()
         {
-            foreach (var obj in _objs)
+            foreach (var m in _objs)
             {
-                obj.Update();
+                m.Update();
+                if (m is Meteor && m.Collision(_bullet))
+                {
+                    System.Media.SystemSounds.Hand.Play();
+                    m.Pos = new Point(10, r.Next(0, Width));
+                }
             }
+            _bullet.Update();
         }
     }
 }
