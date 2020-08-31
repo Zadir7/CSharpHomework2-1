@@ -12,7 +12,7 @@ namespace ComputerGame
         Image img;
         public Meteor(Point pos, Point dir, Size size) : base(pos,dir,size)
         {
-            img = Image.FromFile("meteor.jpg");
+            img = Image.FromFile("../../Images/meteor.jpg");
         }
         public override void Draw()
         {

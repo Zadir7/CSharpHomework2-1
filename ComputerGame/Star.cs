@@ -12,7 +12,7 @@ namespace ComputerGame
         Image img;
         public Star(Point pos, Point dir, Size size) : base(pos, dir, size)
         {
-            img = Image.FromFile("star.jpg");
+            img = Image.FromFile("../../Images/star.jpg");
         }
         public override void Draw()
         {

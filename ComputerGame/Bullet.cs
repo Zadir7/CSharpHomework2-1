@@ -13,7 +13,7 @@ namespace ComputerGame
 
         public Bullet(Point pos, Point dir, Size size) : base(pos, dir, size)
         {
-            img = Image.FromFile("bullet.jpg");
+            img = Image.FromFile("../../Images/bullet.jpg");
         }
         public override void Draw()
         {
