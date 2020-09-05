@@ -9,6 +9,7 @@ namespace ComputerGame
 {
     abstract class BaseObject : ICollision
     {
+        public delegate void Message();
         internal Point Pos;
         internal Point Dir;
         internal Size Size;
