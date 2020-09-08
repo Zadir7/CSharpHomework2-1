@@ -13,9 +13,10 @@ namespace ComputerGame
         private static BufferedGraphicsContext _context;
         public static BufferedGraphics Buffer;
         public static BaseObject[] _objs;
-        public static BaseObject[] _meteors;
+        public static List<Meteor> _meteors;
         public static BaseObject[] _hps;
-        public static Bullet _bullet;
+        public static List<Bullet> _bullets;
+        public static int CurrentMeteorCount = 20;
         static Random r = new Random();
         private static Timer timer = new Timer { Interval = 100 };
         public static int Score { get; set; }
@@ -74,7 +75,10 @@ namespace ComputerGame
             {
                 meteor?.Draw();
             }
-            _bullet?.Draw();
+            foreach (Bullet b in _bullets)
+            {
+                b.Draw();
+            }
             _ship?.Draw();
             if (_ship != null)
             {
@@ -86,20 +90,14 @@ namespace ComputerGame
         public static void Load()
         {
             _objs = new BaseObject[20];
-            _meteors = new BaseObject[20];
+            _meteors = new List<Meteor>();
             _hps = new BaseObject[1];
+            _bullets = new List<Bullet>();
             for (int i = 0; i < _hps.Length; i++)
             {
                 new HealthPack(new Point(720, 0), new Point(r.Next(7,14), r.Next(7, 14)), new Size(25, 25));
             }
-            for (int i = 0; i < 3; i++)
-            {
-                _meteors[i] = new Meteor(new Point(750, i * 20), new Point(2*i+7, 2*i+7), new Size(15 + i, 15 + i));
-            }
-            for (int i = 3; i < _meteors.Length; i++)
-            {
-                _meteors[i] = new Meteor(new Point(750, i * 20), new Point(r.Next(i / 2, i), r.Next(-i / 2, i)), new Size(15 + i, 15 + i));
-            }
+            GenerateMeteors();
             
             for (int i = 0; i < _objs.Length; i++)
             {
@@ -113,24 +111,47 @@ namespace ComputerGame
             {
                 obj.Update();
             }
-            _bullet?.Update();
-            for (int i = 0; i < _meteors.Length; i++)
+            for (int i = 0; i < _bullets.Count; i++)
             {
-                if (_meteors[i] == null) _meteors[i] = new Meteor(new Point(750, i * 20), new Point(r.Next(i / 2, i), r.Next(i / 2, i)), new Size(3 + i, 3 + i));
-                _meteors[i].Update();
-                if (_bullet != null && _bullet.Collision(_meteors[i]))
+                if (_bullets[i].Pos.X > Width)
                 {
-                    System.Media.SystemSounds.Hand.Play();
-                    Score += 3;
-                    _meteors[i] = null;
-                    _bullet = null;
-                    continue;
+                    _bullets.RemoveAt(i);
+                    i--;
                 }
+            }
+            
+            for (int i = 0; i < _meteors.Count; i++)
+            {
+                _meteors[i].Update();
+                for (int j = 0; j < _bullets.Count; j++)
+                {
+                    if (_bullets[j].Collision(_meteors[i]))
+                    {
+                        
+                        System.Media.SystemSounds.Hand.Play();
+                        Score += 3;
+                        _bullets.RemoveAt(j);
+                        j--; 
+                        _meteors.RemoveAt(i);
+                        if (_meteors.Count == 0)
+                        {
+                            CurrentMeteorCount++;
+                            GenerateMeteors();
+                        }
+                        if (i != 0) i--;
+                    }
+                }
+
                 if (!_ship.Collision(_meteors[i])) continue;
                 _ship?.EnergyDrain(r.Next(3, 15));
-                _meteors[i] = null;
+                _meteors.RemoveAt(i);
+                if (i != 0) i--;
                 System.Media.SystemSounds.Asterisk.Play();
                 if (_ship.Energy <= 0) _ship.Die();
+            }
+            foreach (Bullet b in _bullets)
+            {
+                b.Update();
             }
             for (int i = 0; i < _hps.Length; i++)
             {
@@ -145,7 +166,7 @@ namespace ComputerGame
               
         }
         private static void Form_KeyDown(object sender, KeyEventArgs e) {
-            if (e.KeyCode == Keys.ControlKey) _bullet = new Bullet(new Point(_ship.Pos.X + 10, _ship.Pos.Y + 15), new Point(25, 0), new Size(15, 6));
+            if (e.KeyCode == Keys.ControlKey) _bullets.Add(new Bullet(new Point(_ship.Pos.X + 10, _ship.Pos.Y + 15), new Point(25, 0), new Size(15, 6)));
             if (e.KeyCode == Keys.Up) _ship.MoveUp();
             if (e.KeyCode == Keys.Down) _ship.MoveDown();
         }
@@ -155,6 +176,13 @@ namespace ComputerGame
             timer.Stop();
             Buffer.Graphics.DrawString("The End. Score: " +Score, new Font(FontFamily.GenericSansSerif, 40, FontStyle.Underline), Brushes.Red, 150, 200);
             Buffer.Render();
+        }
+        public static void GenerateMeteors()
+        {
+            for (int i = 0; i < CurrentMeteorCount; i++)
+            {
+                _meteors.Add(new Meteor(new Point(750, 20), new Point(r.Next(5, 20), r.Next(-20, 20)), new Size(20, 20)));
+            }
         }
     }
 }

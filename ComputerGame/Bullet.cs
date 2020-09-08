@@ -23,7 +23,6 @@ namespace ComputerGame
         public override void Update()
         {
             Pos.X += Dir.X;
-            if (Pos.X > GameBondarev.Width) { Pos.X = 0; }
         }
     }
 }
